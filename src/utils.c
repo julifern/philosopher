@@ -6,7 +6,7 @@
 /*   By: julifern <julifern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 18:41:47 by julifern          #+#    #+#             */
-/*   Updated: 2025/09/02 12:05:28 by julifern         ###   ########.fr       */
+/*   Updated: 2025/09/02 15:33:24 by julifern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,6 @@ long	get_time(void)
 	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
-void	ft_usleep(long time)
-{
-	long	start;
-	
-	start = get_time();
-	while ((get_time() - start) < time)
-		usleep(100);
-}
-
 void	destroy_mutex(t_data *data)
 {
 	int	i;
@@ -48,7 +39,7 @@ void	destroy_mutex(t_data *data)
 		pthread_mutex_destroy(&data->forks[i].fork);
 }
 
-int		error_message(char *error)
+int	error_message(char *error)
 {
 	printf("%s\n", error);
 	return (1);

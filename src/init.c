@@ -6,7 +6,7 @@
 /*   By: julifern <julifern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 18:51:56 by julifern          #+#    #+#             */
-/*   Updated: 2025/09/02 13:36:40 by julifern         ###   ########.fr       */
+/*   Updated: 2025/09/02 16:56:23 by julifern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ static int	philo_init(t_data *data)
 		philo->data = data;
 		assign_forks(philo, data->forks, i);
 		philo->last_meal_time = get_time();
+		philo->fork_check = 0;
 		i++;
 	}
 	return (0);
@@ -46,7 +47,6 @@ int	data_init(t_data *data)
 
 	i = 0;
 	data->end_simulation = 0;
-	data->all_threads_ready = 0;
 	data->philos = malloc(sizeof(t_philo) * data->philo_nbr);
 	if (!data->philos)
 		return (1);
@@ -55,13 +55,17 @@ int	data_init(t_data *data)
 		return (1);
 	while (i < data->philo_nbr)
 	{
-		pthread_mutex_init(&data->forks[i].fork, NULL);
+		if (pthread_mutex_init(&data->forks[i].fork, NULL))
+			return (1);
 		data->forks[i].fork_id = i;
+		data->forks[i].is_taken = 0;
 		i++;
 	}
-	pthread_mutex_init(&data->data_mutex, NULL);
-	pthread_mutex_init(&data->write_mutex, NULL);
+	if (pthread_mutex_init(&data->data_mutex, NULL))
+		return (1);
+	if (pthread_mutex_init(&data->write_mutex, NULL))
+		return (1);
 	if (philo_init(data))
-		return (error_message("error while creating threads"));
+		return (error_message("Error while creating threads"));
 	return (0);
 }

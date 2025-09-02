@@ -6,26 +6,39 @@
 /*   By: julifern <julifern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 18:03:26 by julifern          #+#    #+#             */
-/*   Updated: 2025/09/02 13:37:17 by julifern         ###   ########.fr       */
+/*   Updated: 2025/09/02 18:05:23 by julifern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	start_simul(t_data *data)
+static void	stop_and_join(t_data *data, int i)
+{
+	pthread_mutex_lock(&data->data_mutex);
+	data->end_simulation = 1;
+	pthread_mutex_unlock(&data->data_mutex);
+	while (i > 0)
+		pthread_join(data->philos[i--].thread_id, NULL);
+}
+
+static int	start_simul(t_data *data)
 {
 	pthread_t	monitor_thread;
 	int			i;
-	
+
 	i = 0;
 	while (i < data->philo_nbr)
 	{
-		if (pthread_create(&data->philos[i].thread_id, NULL, routine, &data->philos[i]))
-			return (error_message("error while creating philo thread"));
+		if (pthread_create(&data->philos[i].thread_id, NULL,
+				routine, &data->philos[i]))
+		{
+			stop_and_join(data, i - 1);
+			return (error_message("Error while creating philo thread"));
+		}
 		i++;
 	}
 	if (pthread_create(&monitor_thread, NULL, monitor, data))
-		return (error_message("error while creating philo thread"));
+		return (error_message("Error while creating philo thread"));
 	pthread_join(monitor_thread, NULL);
 	i = 0;
 	while (i < data->philo_nbr)
@@ -49,6 +62,9 @@ int	main(int ac, char **av)
 		free_all(&data);
 	}
 	else
+	{
+		free_all(&data);
 		return (error_message("Wrong argument number"));
+	}
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: julifern <julifern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 18:07:43 by julifern          #+#    #+#             */
-/*   Updated: 2025/09/02 13:35:09 by julifern         ###   ########.fr       */
+/*   Updated: 2025/09/02 15:29:40 by julifern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,11 @@ static int	check_death(t_data *data, t_philo *philo)
 	return (0);
 }
 
-static int check_full(t_data *data)
+static int	check_full(t_data *data)
 {
 	int		all_full;
 	int		i;
-	
+
 	if (data->total_meals <= 0)
 		return (0);
 	i = 0;
@@ -47,7 +47,7 @@ static int check_full(t_data *data)
 		i++;
 	}
 	if (all_full)
-			data->end_simulation = 1;
+		data->end_simulation = 1;
 	pthread_mutex_unlock(&data->data_mutex);
 	return (all_full);
 }
@@ -56,7 +56,7 @@ void	*monitor(void *arg)
 {
 	t_data	*data;
 	int		i;
-	
+
 	data = (t_data *)arg;
 	while (!get_end_simulation(data))
 	{

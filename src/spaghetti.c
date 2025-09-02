@@ -6,22 +6,29 @@
 /*   By: julifern <julifern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 18:10:09 by julifern          #+#    #+#             */
-/*   Updated: 2025/09/02 13:29:19 by julifern         ###   ########.fr       */
+/*   Updated: 2025/09/02 18:05:08 by julifern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	put_forks_down(t_philo *philo)
+static int	put_forks_down(t_philo *philo)
 {
+	if (get_end_simulation(philo->data))
+		return (1);
+	pthread_mutex_lock(&philo->left_fork->fork);
+	philo->left_fork->is_taken = 0;
 	pthread_mutex_unlock(&philo->left_fork->fork);
+	pthread_mutex_lock(&philo->right_fork->fork);
+	philo->right_fork->is_taken = 0;
 	pthread_mutex_unlock(&philo->right_fork->fork);
+	return (0);
 }
 
-void	philo_action(t_philo *philo, int time)
+static void	philo_action(t_philo *philo, int time)
 {
 	long	start;
-	
+
 	start = get_time();
 	while (!get_end_simulation(philo->data))
 	{
@@ -35,40 +42,39 @@ int	philo_routine(t_philo *philo)
 {
 	if (get_end_simulation(philo->data))
 		return (0);
-	if (!take_forks(philo))
-		return (0);
-	if (get_end_simulation(philo->data))
+	while (philo->fork_check != 3)
 	{
-		put_forks_down(philo);
-		return (0);
+		if (!take_forks(philo))
+			return (0);
 	}
-	print_message(philo, "is eating");
+	philo->fork_check = 0;
+	print_message(philo, EATING);
 	pthread_mutex_lock(&philo->data->data_mutex);
 	philo->last_meal_time = get_time();
 	philo->meals++;
 	pthread_mutex_unlock(&philo->data->data_mutex);
-	print_meal(philo);
 	philo_action(philo, philo->data->time_to_eat);
-	put_forks_down(philo);
-	if (get_end_simulation(philo->data))
+	if (put_forks_down(philo))
 		return (0);
-	print_message(philo, "is sleeping");
+	print_message(philo, SLEEPING);
 	philo_action(philo, philo->data->time_to_sleep);
 	if (get_end_simulation(philo->data))
 		return (0);
-	print_message(philo, "is thinking");
+	print_message(philo, THINKING);
+	philo_action(philo, (philo->data->time_to_die - philo->data->time_to_eat
+			- philo->data->time_to_sleep) / 10);
 	return (1);
 }
 
 void	*routine(void *arg)
 {
 	t_philo	*philo;
-	
+
 	philo = (t_philo *)arg;
 	if (philo->data->philo_nbr == 1)
 	{
-		print_message(philo, "has taken a fork");
-		usleep(philo->data->time_to_die * 1000);
+		print_message(philo, "has taken the fork");
+		philo_action(philo, philo->data->time_to_die);
 		return (NULL);
 	}
 	while (1)
@@ -80,7 +86,8 @@ void	*routine(void *arg)
 			break ;
 		}
 		pthread_mutex_unlock(&philo->data->data_mutex);
-		philo_routine(philo);
+		if (!philo_routine(philo))
+			return (NULL);
 	}
 	return (NULL);
 }
