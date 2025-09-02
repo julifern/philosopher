@@ -1,0 +1,16 @@
+# Compiled binaries
+philo
+*.out
+*.o
+
+# Backup files
+*~
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Misc
+*.tmp
+*.vscode
