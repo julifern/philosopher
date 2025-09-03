@@ -6,27 +6,29 @@
 /*   By: julifern <julifern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/02 12:58:27 by julifern          #+#    #+#             */
-/*   Updated: 2025/09/02 19:31:28 by julifern         ###   ########.fr       */
+/*   Updated: 2025/09/03 14:02:56 by julifern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static int	lock_fork(t_philo *philo, pthread_mutex_t *fork, char *message)
+static int	lock_fork(t_philo *philo, pthread_mutex_t *fork)
 {
-	(void)message;
 	pthread_mutex_lock(fork);
+	pthread_mutex_lock(&philo->data->data_mutex);
 	if (philo->data->end_simulation)
 	{
+		pthread_mutex_unlock(&philo->data->data_mutex);
 		pthread_mutex_unlock(fork);
 		return (0);
 	}
+	pthread_mutex_unlock(&philo->data->data_mutex);
 	return (1);
 }
 
 static int	take_forks_odd(t_philo *philo)
 {
-	if (!lock_fork(philo, &philo->right_fork->fork, RIGHT_FORK))
+	if (!lock_fork(philo, &philo->right_fork->fork))
 		return (0);
 	if (!philo->right_fork->is_taken)
 	{
@@ -34,7 +36,7 @@ static int	take_forks_odd(t_philo *philo)
 		philo->fork_check |= 1;
 	}
 	pthread_mutex_unlock(&philo->right_fork->fork);
-	if (!lock_fork(philo, &philo->left_fork->fork, LEFT_FORK))
+	if (!lock_fork(philo, &philo->left_fork->fork))
 		return (0);
 	if (!philo->left_fork->is_taken)
 	{
@@ -47,7 +49,7 @@ static int	take_forks_odd(t_philo *philo)
 
 static int	take_forks_even(t_philo *philo)
 {
-	if (!lock_fork(philo, &philo->left_fork->fork, LEFT_FORK))
+	if (!lock_fork(philo, &philo->left_fork->fork))
 		return (0);
 	if (!philo->left_fork->is_taken)
 	{
@@ -55,7 +57,7 @@ static int	take_forks_even(t_philo *philo)
 		philo->fork_check |= 2;
 	}
 	pthread_mutex_unlock(&philo->left_fork->fork);
-	if (!lock_fork(philo, &philo->right_fork->fork, RIGHT_FORK))
+	if (!lock_fork(philo, &philo->right_fork->fork))
 		return (0);
 	if (!philo->right_fork->is_taken)
 	{
@@ -68,8 +70,13 @@ static int	take_forks_even(t_philo *philo)
 
 int	take_forks(t_philo *philo)
 {
+	pthread_mutex_lock(&philo->data->data_mutex);
 	if (philo->data->end_simulation)
+	{
+		pthread_mutex_unlock(&philo->data->data_mutex);
 		return (0);
+	}
+	pthread_mutex_unlock(&philo->data->data_mutex);
 	if (philo->philo_id % 2 == 0 && !take_forks_even(philo))
 		return (0);
 	else if (!take_forks_odd(philo))

@@ -6,7 +6,7 @@
 /*   By: julifern <julifern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 18:10:09 by julifern          #+#    #+#             */
-/*   Updated: 2025/09/02 18:05:08 by julifern         ###   ########.fr       */
+/*   Updated: 2025/09/03 10:22:57 by julifern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ int	philo_routine(t_philo *philo)
 	print_message(philo, THINKING);
 	philo_action(philo, (philo->data->time_to_die - philo->data->time_to_eat
 			- philo->data->time_to_sleep) / 10);
+	usleep(100);
 	return (1);
 }
 
@@ -88,6 +89,7 @@ void	*routine(void *arg)
 		pthread_mutex_unlock(&philo->data->data_mutex);
 		if (!philo_routine(philo))
 			return (NULL);
+		usleep(100);
 	}
 	return (NULL);
 }
