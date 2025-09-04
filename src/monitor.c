@@ -6,7 +6,7 @@
 /*   By: julifern <julifern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 18:07:43 by julifern          #+#    #+#             */
-/*   Updated: 2025/09/04 16:17:01 by julifern         ###   ########.fr       */
+/*   Updated: 2025/09/04 17:45:20 by julifern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,14 @@
 static int	check_death(t_data *data, t_philo *philo)
 {
 	int	time;
-	
+
 	pthread_mutex_lock(&philo->data->data_mutex);
 	time = get_time() - philo->last_meal_time;
 	pthread_mutex_unlock(&philo->data->data_mutex);
 	if (time > data->time_to_die)
 	{
 		pthread_mutex_lock(&data->write_mutex);
-		printf("at time(ms) %ld, philosopher %d has died...\n",
+		printf("%ld %d has died\n",
 			get_time() - data->start_time, philo->philo_id);
 		pthread_mutex_lock(&data->data_mutex);
 		data->end_simulation = 1;
