@@ -6,7 +6,7 @@
 /*   By: julifern <julifern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/02 12:58:27 by julifern          #+#    #+#             */
-/*   Updated: 2025/09/03 14:02:56 by julifern         ###   ########.fr       */
+/*   Updated: 2025/09/04 12:08:35 by julifern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ static int	take_forks_even(t_philo *philo)
 {
 	if (!lock_fork(philo, &philo->left_fork->fork))
 		return (0);
-	if (!philo->left_fork->is_taken)
+	if (!philo->left_fork->is_taken) 
 	{
 		philo->left_fork->is_taken = 1;
 		philo->fork_check |= 2;
