@@ -1,7 +1,8 @@
 NAME = philo
 
 CC = cc
-CFLAGS = -Wall -Werror -Wextra -g -I$(INCLUDES)
+CFLAGS = -Wall -Werror -Wextra -g -I$(INCLUDES) 
+# -fsanitize=thread
 
 SRC_DIR = src/
 OBJ_DIR = obj/

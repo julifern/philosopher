@@ -6,7 +6,7 @@
 /*   By: julifern <julifern@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/30 18:07:43 by julifern          #+#    #+#             */
-/*   Updated: 2025/09/03 11:59:30 by julifern         ###   ########.fr       */
+/*   Updated: 2025/09/03 14:26:12 by julifern         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,12 @@
 
 static int	check_death(t_data *data, t_philo *philo)
 {
-	// pthread_mutex_lock(&philo->data->data_mutex);
-	if (get_time() - philo->last_meal_time > data->time_to_die)
+	int	time;
+	
+	pthread_mutex_lock(&philo->data->data_mutex);
+	time = get_time() - philo->last_meal_time;
+	pthread_mutex_unlock(&philo->data->data_mutex);
+	if (time > data->time_to_die)
 	{
 		// pthread_mutex_unlock(&philo->data->data_mutex);
 		pthread_mutex_lock(&data->write_mutex);
